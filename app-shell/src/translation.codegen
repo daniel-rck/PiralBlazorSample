@@ -1,0 +1,24 @@
+const { readdir, readFile } = require('fs/promises');
+const { resolve } = require('path');
+
+async function readLanguage(i18nDir, fileName) {
+  const content = await readFile(i18nDir + '/' + fileName, 'utf8');
+  return {
+    language: fileName.split('.')[0],
+    content
+  };
+}
+
+module.exports = async function () {
+  const assets = resolve(process.cwd(), 'src', 'assets');
+  const i18nDir = resolve(assets, 'i18n');
+  const languageFileNames = await readdir(i18nDir);
+
+  const languages = await Promise.all(languageFileNames.map(x => readLanguage(i18nDir, x)));
+  const generated = `
+    export const translations = {
+      ${languages.map(x => '"' + x.language + '":' + x.content).join(',')}
+    }
+  `;
+  return generated;
+};

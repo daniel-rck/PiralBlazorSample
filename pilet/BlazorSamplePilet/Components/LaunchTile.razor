@@ -1,0 +1,12 @@
+@attribute [PiralComponent("launch-tile")]
+@inject IPiletService Pilet
+
+<a class="tile-card" href="/start">
+    <img src="@Pilet.GetUrl("images/opera.png")" alt="icon">
+    <div class="label">
+        <p>My super tool</p>
+    </div>
+</a>
+
+@code {
+}

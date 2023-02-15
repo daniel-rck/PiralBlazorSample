@@ -1,0 +1,64 @@
+﻿@page "/other"
+@page "/other/single/{id}"
+@inject IPiletService pilet
+
+@if (Id != null)
+{
+    <div>
+    ID: @Id
+</div>
+}
+else
+{
+    <div>
+    The Id was not read from the url.
+    <a href="/other/single/12345">Go to URL with parameter 12345</a>
+</div>
+}
+
+<MyButton />
+
+<p>Outputting the "try-order" extension components <b>without</b> ordering:</p>
+
+<Extension Name="try-order" />
+
+<p>Outputting the "try-order" extension components <b>with</b> ordering:</p>
+
+<Extension Name="try-order" Order=@OrderExtensions />
+
+<p>This page works best on @GetBrowser().</p>
+
+<button class="btn btn-primary" @onclick="ChangeBrowser">Other browsers?</button>
+
+@code {
+    private int bid = 0;
+
+    [Parameter]
+    [PiralRouteParameter("id")]
+    public string Id { get; set; } = "";
+
+    public List<ExtensionRegistration> OrderExtensions(List<ExtensionRegistration> components)
+    {
+        return components.OrderBy(m => ((System.Text.Json.JsonElement)m.Defaults).GetProperty("order").GetInt32()).ToList();
+    }
+
+    RenderFragment GetBrowser()
+    {
+        switch (bid)
+        {
+            case 1:
+                return @<img src=@pilet.GetUrl("images/chrome.png") alt="Chrome" />;
+            case 2:
+                return @<img src=@pilet.GetUrl("images/opera.png") alt="Opera" />;
+            case 3:
+                return @<img src=@pilet.GetUrl("images/safari.png") alt="Safari" />;
+            default:
+                return @<img src=@pilet.GetUrl("images/firefox.png") alt="Firefox" />;
+        }
+    }
+
+    void ChangeBrowser()
+    {
+        bid = (bid + 1) % 4;
+    }
+}
